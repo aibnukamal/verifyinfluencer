@@ -10,11 +10,19 @@ html {
   line-height: 1.5;
   tab-size: 4;
   scroll-behavior: smooth;
+  background: #001529;
 }
 body {
   font-family: inherit;
   line-height: inherit;
   margin: 0;
+}
+h1,
+h2 {
+  color: black;
+}
+.next-error-h1 {
+  border-color: #000 !important;
 }
 h1,
 h2,
