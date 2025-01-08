@@ -13,28 +13,46 @@ importers:
         version: 5.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@ant-design/nextjs-registry':
         specifier: ^1.0.2
-        version: 1.0.2(@ant-design/cssinjs@1.22.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(antd@5.22.7(luxon@3.5.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(next@14.2.16(@babel/core@7.26.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.83.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 1.0.2(@ant-design/cssinjs@1.22.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(antd@5.22.7(luxon@3.5.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(next@14.2.16(@babel/core@7.26.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.83.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@nestjs/axios':
+        specifier: ^3.1.3
+        version: 3.1.3(@nestjs/common@10.4.15(class-validator@0.14.1)(reflect-metadata@0.1.14)(rxjs@7.8.1))(axios@1.7.9)(rxjs@7.8.1)
       '@nestjs/common':
         specifier: ^10.0.2
-        version: 10.4.15(reflect-metadata@0.1.14)(rxjs@7.8.1)
+        version: 10.4.15(class-validator@0.14.1)(reflect-metadata@0.1.14)(rxjs@7.8.1)
       '@nestjs/core':
         specifier: ^10.0.2
-        version: 10.4.15(@nestjs/common@10.4.15(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.4.15)(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.8.1)
+        version: 10.4.15(@nestjs/common@10.4.15(class-validator@0.14.1)(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.4.15)(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.8.1)
       '@nestjs/platform-express':
         specifier: ^10.0.2
-        version: 10.4.15(@nestjs/common@10.4.15(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.15)
+        version: 10.4.15(@nestjs/common@10.4.15(class-validator@0.14.1)(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.15)
       antd:
         specifier: ^5.22.7
-        version: 5.22.7(luxon@3.5.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 5.22.7(luxon@3.5.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       axios:
         specifier: ^1.6.0
         version: 1.7.9
+      cheerio:
+        specifier: ^1.0.0
+        version: 1.0.0
+      class-validator:
+        specifier: ^0.14.1
+        version: 0.14.1
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      dotenv:
+        specifier: ^16.4.7
+        version: 16.4.7
+      moment:
+        specifier: ^2.30.1
+        version: 2.30.1
       next:
         specifier: 14.2.16
         version: 14.2.16(@babel/core@7.26.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.83.1)
+      openai:
+        specifier: ^4.77.3
+        version: 4.77.3(encoding@0.1.13)
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -59,7 +77,7 @@ importers:
         version: 10.2.3(chokidar@3.6.0)(typescript@5.6.3)
       '@nestjs/testing':
         specifier: ^10.0.2
-        version: 10.4.15(@nestjs/common@10.4.15(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.15)(@nestjs/platform-express@10.4.15)
+        version: 10.4.15(@nestjs/common@10.4.15(class-validator@0.14.1)(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.15)(@nestjs/platform-express@10.4.15)
       '@nx/eslint':
         specifier: 20.3.0
         version: 20.3.0(@babel/traverse@7.26.4)(@swc-node/register@1.9.2(@swc/core@1.5.29(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.6.3))(@swc/core@1.5.29(@swc/helpers@0.5.15))(@types/node@18.16.20)(@zkochan/js-yaml@0.0.7)(eslint@9.17.0(jiti@1.21.7))(nx@20.3.0(@swc-node/register@1.9.2(@swc/core@1.5.29(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.6.3))(@swc/core@1.5.29(@swc/helpers@0.5.15)))
@@ -1231,6 +1249,13 @@ packages:
   '@napi-rs/wasm-runtime@0.2.4':
     resolution: {integrity: sha512-9zESzOO5aDByvhIAsOy9TbpZ0Ur2AJbUI7UT73kcUTS2mxAMHOBaa1st/jAymNoCtvrit99kkzT1FZuXVcgfIQ==}
 
+  '@nestjs/axios@3.1.3':
+    resolution: {integrity: sha512-RZ/63c1tMxGLqyG3iOCVt7A72oy4x1eM6QEhd4KzCYpaVWW0igq0WSREeRoEZhIxRcZfDfIIkvsOMiM7yfVGZQ==}
+    peerDependencies:
+      '@nestjs/common': ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
+      axios: ^1.3.1
+      rxjs: ^6.0.0 || ^7.0.0
+
   '@nestjs/common@10.4.15':
     resolution: {integrity: sha512-vaLg1ZgwhG29BuLDxPA9OAcIlgqzp9/N8iG0wGapyUNTf4IY4O6zAHgN6QalwLhFxq7nOI021vdRojR1oF3bqg==}
     peerDependencies:
@@ -2004,6 +2029,9 @@ packages:
   '@types/mime@1.3.5':
     resolution: {integrity: sha512-/pyBZWSLD2n0dcHE3hq8s8ZvcETHtEuF+3E7XVt0Ig2nvsVQXdghHVcEkIWjy9A0wKfTn97a/PSDYohKIlnP/w==}
 
+  '@types/node-fetch@2.6.12':
+    resolution: {integrity: sha512-8nneRWKCg3rMtF69nLQJnOYUcbafYeFSjqkw3jCRLsqkWFlHaoQrr5mXmofFGOx3DKn7UfmBMyov8ySvLRVldA==}
+
   '@types/node-forge@1.3.11':
     resolution: {integrity: sha512-FQx220y22OKNTqaByeBGqHWYz4cl94tpcxeFdvBo3wjG6XPBuZ0BNgNZRV5J5TFmmcsJ4IzsLkmGRiQbnYsBEQ==}
 
@@ -2051,6 +2079,9 @@ packages:
 
   '@types/tough-cookie@4.0.5':
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
+
+  '@types/validator@13.12.2':
+    resolution: {integrity: sha512-6SlHBzUW8Jhf3liqrGGXyTJSIFe4nqlJ5A5KaMZ2l/vbM3Wh3KSybots/wfWVzNLK4D1NZluDlSQIbIEPx6oyA==}
 
   '@types/ws@8.5.13':
     resolution: {integrity: sha512-osM/gWBTPKgHV8XkTunnegTRIsvF6owmf5w+JtAfOw472dptdm0dlGv4xCt6GwQRcC2XVOvvRE/0bAoQcL2QkA==}
@@ -2199,6 +2230,10 @@ packages:
     resolution: {integrity: sha512-j2afSsaIENvHZN2B8GOpF566vZ5WVk5opAiMTvWgaQT8DkbOqsTfvNAvHoRGU2zzP8cPoqys+xHTRDWW8L+/BA==}
     deprecated: Use your platform's native atob() and btoa() methods instead
 
+  abort-controller@3.0.0:
+    resolution: {integrity: sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==}
+    engines: {node: '>=6.5'}
+
   accepts@1.3.8:
     resolution: {integrity: sha512-PYAthTa2m2VKxuvSD3DPC/Gy+U+sOA1LAuT8mkmRuvw+NACSaeXEQ+NHcVF7rONl6qcaxV3Uuemwawk+7+SJLw==}
     engines: {node: '>= 0.6'}
@@ -2237,6 +2272,10 @@ packages:
   agent-base@6.0.2:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
     engines: {node: '>= 6.0.0'}
+
+  agentkeepalive@4.6.0:
+    resolution: {integrity: sha512-kja8j7PjmncONqaTsB8fQ+wE2mSU2DJ9D4XKoJ5PFWIdRMa6SLSN1ff4mOr4jCbfRSsxR4keIiySJU0N9T5hIQ==}
+    engines: {node: '>= 8.0.0'}
 
   ajv-formats@2.1.1:
     resolution: {integrity: sha512-Wx0Kx52hxE7C18hkMEggYlEifqWZtYaRgouJor+WMdPnQyEK13vgEWyVNup7SoeeoLMsr4kf5h6dOW11I15MUA==}
@@ -2605,6 +2644,13 @@ packages:
     resolution: {integrity: sha512-kWWXztvZ5SBQV+eRgKFeh8q5sLuZY2+8WUIzlxWVTg+oGwY14qylx1KbKzHd8P6ZYkAg0xyIDU9JMHhyJMZ1jw==}
     engines: {node: '>=10'}
 
+  cheerio-select@2.1.0:
+    resolution: {integrity: sha512-9v9kG0LvzrlcungtnJtpGNxY+fzECQKhK4EGJX2vByejiMX84MFNQw4UxPJl3bFbTMw+Dfs37XaIkCwTZfLh4g==}
+
+  cheerio@1.0.0:
+    resolution: {integrity: sha512-quS9HgjQpdaXOvsZz82Oz7uxtXiy6UIsIQcpBj7HRw2M63Skasm9qlDocAM7jNuaxdhpPU7c4kJN+gA5MCu4ww==}
+    engines: {node: '>=18.17'}
+
   chokidar@3.6.0:
     resolution: {integrity: sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==}
     engines: {node: '>= 8.10.0'}
@@ -2623,6 +2669,9 @@ packages:
 
   cjs-module-lexer@1.4.1:
     resolution: {integrity: sha512-cuSVIHi9/9E/+821Qjdvngor+xpnlwnuwIyZOaLmHBVdXL+gP+I6QQB9VkO7RI77YIcTV+S1W9AreJ5eN63JBA==}
+
+  class-validator@0.14.1:
+    resolution: {integrity: sha512-2VEG9JICxIqTpoK1eMzZqaV+u/EiwEJkMGzTrZf6sU/fwsnOITVgYJ8yojSy6CaXtO9V0Cc6ZQZ8h8m4UBuLwQ==}
 
   classnames@2.5.1:
     resolution: {integrity: sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==}
@@ -3152,6 +3201,9 @@ packages:
     resolution: {integrity: sha512-Q0n9HRi4m6JuGIV1eFlmvJB7ZEVxu93IrMyiMsGC0lrMJMWzRgx6WGquyfQgZVb31vhGgXnfmPNNXmxnOkRBrg==}
     engines: {node: '>= 0.8'}
 
+  encoding-sniffer@0.2.0:
+    resolution: {integrity: sha512-ju7Wq1kg04I3HtiYIOrUrdfdDvkyO9s5XM8QAj/bN61Yo/Vb4vgJxy5vi4Yxk01gWHbrofpPtpxM8bKger9jhg==}
+
   encoding@0.1.13:
     resolution: {integrity: sha512-ETBauow1T35Y/WZMkio9jiM0Z5xjHHmJ4XmjZOq1l/dXz3lr2sRn87nJy20RupqSh1F2m3HHPSp8ShIPQJrJ3A==}
 
@@ -3389,6 +3441,10 @@ packages:
     resolution: {integrity: sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==}
     engines: {node: '>= 0.6'}
 
+  event-target-shim@5.0.1:
+    resolution: {integrity: sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==}
+    engines: {node: '>=6'}
+
   eventemitter3@4.0.7:
     resolution: {integrity: sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==}
 
@@ -3544,9 +3600,16 @@ packages:
       vue-template-compiler:
         optional: true
 
+  form-data-encoder@1.7.2:
+    resolution: {integrity: sha512-qfqtYan3rxrnCk1VYaA4H+Ms9xdpPqvLZa6xmMgFvhO32x7/3J/ExcTd6qpxM0vH2GdMI+poehyBZvqfMTto8A==}
+
   form-data@4.0.1:
     resolution: {integrity: sha512-tzN8e4TX8+kkxGPK8D5u0FNmjPUjw3lwC9lSLxxoB/+GtsJG91CO8bSWy73APlgAZzZbXEYZJuxjkHH2w+Ezhw==}
     engines: {node: '>= 6'}
+
+  formdata-node@4.4.1:
+    resolution: {integrity: sha512-0iirZp3uVDjVGt9p49aTaqjk84TrglENEDuqfdlZQ1roC9CWlPk6Avf8EEnZNcAqPonwkG35x4n3ww/1THYAeQ==}
+    engines: {node: '>= 12.20'}
 
   forwarded@0.2.0:
     resolution: {integrity: sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==}
@@ -3750,6 +3813,9 @@ packages:
   html-escaper@2.0.2:
     resolution: {integrity: sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==}
 
+  htmlparser2@9.1.0:
+    resolution: {integrity: sha512-5zfg6mHUoaer/97TxnGpxmbR7zJtPwIYFMZ/H5ucTlPZhKvtum05yiPK3Mgai3a0DyVxv7qYqoweaEd2nrYQzQ==}
+
   http-assert@1.5.0:
     resolution: {integrity: sha512-uPpH7OKX4H25hBmU6G1jWNaqJGpTXxey+YOUizJUAgu0AjLUeC8D73hTrhvDS5D+GJN1DN1+hhc/eF/wpxtp0w==}
     engines: {node: '>= 0.8'}
@@ -3805,6 +3871,9 @@ packages:
   human-signals@2.1.0:
     resolution: {integrity: sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==}
     engines: {node: '>=10.17.0'}
+
+  humanize-ms@1.2.1:
+    resolution: {integrity: sha512-Fl70vYtsAFb/C06PTS9dZBo7ihau+Tu/DNCk/OyHhea07S+aeMWpFFkUaXRa8fI+ScZbEI8dfSxwY7gxZ9SAVQ==}
 
   hyperdyperid@1.2.0:
     resolution: {integrity: sha512-Y93lCzHYgGWdrJ66yIktxiaGULYc6oGiABxhcO5AufBeOyoIdZF7bIfLaOrbM0iGIOXQQgxxRrFEnb+Y6w1n4A==}
@@ -4412,6 +4481,9 @@ packages:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
 
+  libphonenumber-js@1.11.17:
+    resolution: {integrity: sha512-Jr6v8thd5qRlOlc6CslSTzGzzQW03uiscab7KHQZX1Dfo4R6n6FDhZ0Hri6/X7edLIDv9gl4VMZXhxTjLnl0VQ==}
+
   license-webpack-plugin@4.0.2:
     resolution: {integrity: sha512-771TFWFD70G1wLTC4oU2Cw4qvtmNrIw+wRvBtn+okgHl7slJVi7zfNcdmqDL72BojM30VNJ2UHylr1o77U37Jw==}
     peerDependencies:
@@ -4623,6 +4695,9 @@ packages:
     resolution: {integrity: sha512-FP+p8RB8OWpF3YZBCrP5gtADmtXApB5AMLn+vdyA+PyxCjrCs00mjyUozssO33cwDeT3wNGdLxJ5M//YqtHAJw==}
     hasBin: true
 
+  moment@2.30.1:
+    resolution: {integrity: sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==}
+
   ms@2.0.0:
     resolution: {integrity: sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A==}
 
@@ -4690,6 +4765,10 @@ packages:
 
   node-addon-api@7.1.1:
     resolution: {integrity: sha512-5m3bsyrjFWE1xf7nz7YXdN4udnVtXK6/Yfgn5qnahL6bCkf2yKt4k3nuTKAtT4r3IG8JNR2ncsIMdZuAzJjHQQ==}
+
+  node-domexception@1.0.0:
+    resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
+    engines: {node: '>=10.5.0'}
 
   node-fetch@2.7.0:
     resolution: {integrity: sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==}
@@ -4816,6 +4895,15 @@ packages:
     resolution: {integrity: sha512-7x81NCL719oNbsq/3mh+hVrAWmFuEYUqrq/Iw3kUzH8ReypT9QQ0BLoJS7/G9k6N81XjW4qHWtjWwe/9eLy1EQ==}
     engines: {node: '>=12'}
 
+  openai@4.77.3:
+    resolution: {integrity: sha512-wLDy4+KWHz31HRFMW2+9KQuVuT2QWhs0z94w1Gm1h2Ut9vIHr9/rHZggbykZEfyiaJRVgw8ZS9K6AylDWzvPYw==}
+    hasBin: true
+    peerDependencies:
+      zod: ^3.23.8
+    peerDependenciesMeta:
+      zod:
+        optional: true
+
   opener@1.5.2:
     resolution: {integrity: sha512-ur5UIdyw5Y7yEj9wLzhqXiy6GZ3Mwx0yGI+5sMn2r0N0v3cKJvUmFH5yPP+WXh9e0xfyzyJX95D8l088DNFj7A==}
     hasBin: true
@@ -4886,6 +4974,12 @@ packages:
   parse-passwd@1.0.0:
     resolution: {integrity: sha512-1Y1A//QUXEZK7YKz+rD9WydcE1+EuPr6ZBgKecAB8tmoW6UFv0NREVJe1p+jRxtThkcbbKkfwIbWJe/IeE6m2Q==}
     engines: {node: '>=0.10.0'}
+
+  parse5-htmlparser2-tree-adapter@7.1.0:
+    resolution: {integrity: sha512-ruw5xyKs6lrpo9x9rCZqZZnIUntICjQAd0Wsmp396Ul9lN/h+ifgVV1x1gZHi8euej6wTfpqX8j+BFQxF0NS/g==}
+
+  parse5-parser-stream@7.1.2:
+    resolution: {integrity: sha512-JyeQc9iwFLn5TbvvqACIF/VXG6abODeB3Fwmv/TGdLk2LfbWkaySGY72at4+Ty7EkPZj854u4CrICqNk2qIbow==}
 
   parse5@4.0.0:
     resolution: {integrity: sha512-VrZ7eOd3T1Fk4XWNXMgiGBK/z0MG48BWG2uQNU4I72fkQuKUTZpl+u9k+CxEG0twMVzSmXEEz12z5Fnw1jIQFA==}
@@ -6290,6 +6384,10 @@ packages:
     resolution: {integrity: sha512-nWJ91DjeOkej/TA8pXQ3myruKpKEYgqvpw9lz4OPHj/NWFNluYrjbz9j01CJ8yKQd2g4jFoOkINCTW2I5LEEyw==}
     engines: {node: '>= 0.4'}
 
+  undici@6.21.0:
+    resolution: {integrity: sha512-BUgJXc752Kou3oOIuU1i+yZZypyZRqNPW0vqoMPl8VaoalSfeR0D8/t4iAS3yirs79SSMTxTag+ZC86uswv+Cw==}
+    engines: {node: '>=18.17'}
+
   unicode-canonical-property-names-ecmascript@2.0.1:
     resolution: {integrity: sha512-dA8WbNeb2a6oQzAQ55YlT5vQAWGV9WXOsi3SskE3bcCdM0P4SDd+24zS/OCacdRq5BkdsRj9q3Pg6YyQoxIGqg==}
     engines: {node: '>=4'}
@@ -6367,6 +6465,10 @@ packages:
     resolution: {integrity: sha512-OljLrQ9SQdOUqTaQxqL5dEfZWrXExyyWsozYlAWFawPVNuD83igl7uJD2RTkNMbniIYgt8l81eCJGIdQF7avLQ==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
 
+  validator@13.12.0:
+    resolution: {integrity: sha512-c1Q0mCiPlgdTVVVIJIrBuxNicYE+t/7oKeI9MWLj3fh/uq2Pxh/3eeWbVZ4OcGW1TUf53At0njHw5SMdA3tmMg==}
+    engines: {node: '>= 0.10'}
+
   vary@1.1.2:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
@@ -6387,6 +6489,10 @@ packages:
 
   wcwidth@1.0.1:
     resolution: {integrity: sha512-XHPEwS0q6TaxcvG85+8EYkbiCux2XtWG2mkc47Ng2A77BQu9+DqIOJldST4HgPkuea7dvKSj5VgX3P1d4rW8Tg==}
+
+  web-streams-polyfill@4.0.0-beta.3:
+    resolution: {integrity: sha512-QW95TCTaHmsYfHDybGMwO5IJIM93I/6vTRk+daHTWFPhwh+C8Cg7j7XyKrwrj8Ib6vYXe0ocYNrmzY4xAAN6ug==}
+    engines: {node: '>= 14'}
 
   webidl-conversions@3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
@@ -6488,9 +6594,17 @@ packages:
     resolution: {integrity: sha512-p41ogyeMUrw3jWclHWTQg1k05DSVXPLcVxRTYsXUk+ZooOCZLcoYgPZ/HL/D/N+uQPOtcp1me1WhBEaX02mhWg==}
     engines: {node: '>=12'}
 
+  whatwg-encoding@3.1.1:
+    resolution: {integrity: sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ==}
+    engines: {node: '>=18'}
+
   whatwg-mimetype@3.0.0:
     resolution: {integrity: sha512-nt+N2dzIutVRxARx1nghPKGv1xHikU7HKdfafKkLNLindmPU/ch3U31NOCGGA/dmPcmb1VlofO0vnKAcsm0o/Q==}
     engines: {node: '>=12'}
+
+  whatwg-mimetype@4.0.0:
+    resolution: {integrity: sha512-QaKxh0eNIi2mE9p2vEdzfagOKHCcj1pJ56EEHGQOVxp8r9/iszLUUV7v89x9O1p/T+NlTM5W7jW6+cz4Fq1YVg==}
+    engines: {node: '>=18'}
 
   whatwg-url@11.0.0:
     resolution: {integrity: sha512-RKT8HExMpoYx4igMiVMY83lN6UeITKJlBQ+vR/8ZJ8OCdSiN3RwCq+9gH0+Xzj0+5IrM6i4j/6LuvzbZIQgEcQ==}
@@ -6701,10 +6815,10 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@ant-design/nextjs-registry@1.0.2(@ant-design/cssinjs@1.22.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(antd@5.22.7(luxon@3.5.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(next@14.2.16(@babel/core@7.26.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.83.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@ant-design/nextjs-registry@1.0.2(@ant-design/cssinjs@1.22.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(antd@5.22.7(luxon@3.5.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(next@14.2.16(@babel/core@7.26.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.83.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@ant-design/cssinjs': 1.22.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      antd: 5.22.7(luxon@3.5.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      antd: 5.22.7(luxon@3.5.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next: 14.2.16(@babel/core@7.26.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.83.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
@@ -8023,17 +8137,25 @@ snapshots:
       '@emnapi/runtime': 1.3.1
       '@tybys/wasm-util': 0.9.0
 
-  '@nestjs/common@10.4.15(reflect-metadata@0.1.14)(rxjs@7.8.1)':
+  '@nestjs/axios@3.1.3(@nestjs/common@10.4.15(class-validator@0.14.1)(reflect-metadata@0.1.14)(rxjs@7.8.1))(axios@1.7.9)(rxjs@7.8.1)':
+    dependencies:
+      '@nestjs/common': 10.4.15(class-validator@0.14.1)(reflect-metadata@0.1.14)(rxjs@7.8.1)
+      axios: 1.7.9
+      rxjs: 7.8.1
+
+  '@nestjs/common@10.4.15(class-validator@0.14.1)(reflect-metadata@0.1.14)(rxjs@7.8.1)':
     dependencies:
       iterare: 1.2.1
       reflect-metadata: 0.1.14
       rxjs: 7.8.1
       tslib: 2.8.1
       uid: 2.0.2
+    optionalDependencies:
+      class-validator: 0.14.1
 
-  '@nestjs/core@10.4.15(@nestjs/common@10.4.15(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.4.15)(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.8.1)':
+  '@nestjs/core@10.4.15(@nestjs/common@10.4.15(class-validator@0.14.1)(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.4.15)(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.8.1)':
     dependencies:
-      '@nestjs/common': 10.4.15(reflect-metadata@0.1.14)(rxjs@7.8.1)
+      '@nestjs/common': 10.4.15(class-validator@0.14.1)(reflect-metadata@0.1.14)(rxjs@7.8.1)
       '@nuxtjs/opencollective': 0.3.2(encoding@0.1.13)
       fast-safe-stringify: 2.1.1
       iterare: 1.2.1
@@ -8043,14 +8165,14 @@ snapshots:
       tslib: 2.8.1
       uid: 2.0.2
     optionalDependencies:
-      '@nestjs/platform-express': 10.4.15(@nestjs/common@10.4.15(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.15)
+      '@nestjs/platform-express': 10.4.15(@nestjs/common@10.4.15(class-validator@0.14.1)(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.15)
     transitivePeerDependencies:
       - encoding
 
-  '@nestjs/platform-express@10.4.15(@nestjs/common@10.4.15(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.15)':
+  '@nestjs/platform-express@10.4.15(@nestjs/common@10.4.15(class-validator@0.14.1)(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.15)':
     dependencies:
-      '@nestjs/common': 10.4.15(reflect-metadata@0.1.14)(rxjs@7.8.1)
-      '@nestjs/core': 10.4.15(@nestjs/common@10.4.15(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.4.15)(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.8.1)
+      '@nestjs/common': 10.4.15(class-validator@0.14.1)(reflect-metadata@0.1.14)(rxjs@7.8.1)
+      '@nestjs/core': 10.4.15(@nestjs/common@10.4.15(class-validator@0.14.1)(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.4.15)(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.8.1)
       body-parser: 1.20.3
       cors: 2.8.5
       express: 4.21.2
@@ -8080,13 +8202,13 @@ snapshots:
     transitivePeerDependencies:
       - chokidar
 
-  '@nestjs/testing@10.4.15(@nestjs/common@10.4.15(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.15)(@nestjs/platform-express@10.4.15)':
+  '@nestjs/testing@10.4.15(@nestjs/common@10.4.15(class-validator@0.14.1)(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.15)(@nestjs/platform-express@10.4.15)':
     dependencies:
-      '@nestjs/common': 10.4.15(reflect-metadata@0.1.14)(rxjs@7.8.1)
-      '@nestjs/core': 10.4.15(@nestjs/common@10.4.15(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.4.15)(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.8.1)
+      '@nestjs/common': 10.4.15(class-validator@0.14.1)(reflect-metadata@0.1.14)(rxjs@7.8.1)
+      '@nestjs/core': 10.4.15(@nestjs/common@10.4.15(class-validator@0.14.1)(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/platform-express@10.4.15)(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.8.1)
       tslib: 2.8.1
     optionalDependencies:
-      '@nestjs/platform-express': 10.4.15(@nestjs/common@10.4.15(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.15)
+      '@nestjs/platform-express': 10.4.15(@nestjs/common@10.4.15(class-validator@0.14.1)(reflect-metadata@0.1.14)(rxjs@7.8.1))(@nestjs/core@10.4.15)
 
   '@next/env@14.2.16': {}
 
@@ -9118,6 +9240,11 @@ snapshots:
 
   '@types/mime@1.3.5': {}
 
+  '@types/node-fetch@2.6.12':
+    dependencies:
+      '@types/node': 18.16.20
+      form-data: 4.0.1
+
   '@types/node-forge@1.3.11':
     dependencies:
       '@types/node': 18.16.20
@@ -9167,6 +9294,8 @@ snapshots:
   '@types/stack-utils@2.0.3': {}
 
   '@types/tough-cookie@4.0.5': {}
+
+  '@types/validator@13.12.2': {}
 
   '@types/ws@8.5.13':
     dependencies:
@@ -9363,6 +9492,10 @@ snapshots:
 
   abab@2.0.6: {}
 
+  abort-controller@3.0.0:
+    dependencies:
+      event-target-shim: 5.0.1
+
   accepts@1.3.8:
     dependencies:
       mime-types: 2.1.35
@@ -9396,6 +9529,10 @@ snapshots:
       debug: 4.4.0
     transitivePeerDependencies:
       - supports-color
+
+  agentkeepalive@4.6.0:
+    dependencies:
+      humanize-ms: 1.2.1
 
   ajv-formats@2.1.1(ajv@8.12.0):
     optionalDependencies:
@@ -9455,7 +9592,7 @@ snapshots:
 
   ansi-styles@6.2.1: {}
 
-  antd@5.22.7(luxon@3.5.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  antd@5.22.7(luxon@3.5.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@ant-design/colors': 7.2.0
       '@ant-design/cssinjs': 1.22.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -9487,7 +9624,7 @@ snapshots:
       rc-motion: 2.9.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       rc-notification: 5.6.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       rc-pagination: 5.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      rc-picker: 4.8.3(dayjs@1.11.13)(luxon@3.5.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      rc-picker: 4.8.3(dayjs@1.11.13)(luxon@3.5.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       rc-progress: 4.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       rc-rate: 2.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       rc-resize-observer: 1.4.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -9896,6 +10033,29 @@ snapshots:
 
   char-regex@1.0.2: {}
 
+  cheerio-select@2.1.0:
+    dependencies:
+      boolbase: 1.0.0
+      css-select: 5.1.0
+      css-what: 6.1.0
+      domelementtype: 2.3.0
+      domhandler: 5.0.3
+      domutils: 3.2.1
+
+  cheerio@1.0.0:
+    dependencies:
+      cheerio-select: 2.1.0
+      dom-serializer: 2.0.0
+      domhandler: 5.0.3
+      domutils: 3.2.1
+      encoding-sniffer: 0.2.0
+      htmlparser2: 9.1.0
+      parse5: 7.2.1
+      parse5-htmlparser2-tree-adapter: 7.1.0
+      parse5-parser-stream: 7.1.2
+      undici: 6.21.0
+      whatwg-mimetype: 4.0.0
+
   chokidar@3.6.0:
     dependencies:
       anymatch: 3.1.3
@@ -9917,6 +10077,12 @@ snapshots:
   ci-info@3.9.0: {}
 
   cjs-module-lexer@1.4.1: {}
+
+  class-validator@0.14.1:
+    dependencies:
+      '@types/validator': 13.12.2
+      libphonenumber-js: 1.11.17
+      validator: 13.12.0
 
   classnames@2.5.1: {}
 
@@ -10416,6 +10582,11 @@ snapshots:
 
   encodeurl@2.0.0: {}
 
+  encoding-sniffer@0.2.0:
+    dependencies:
+      iconv-lite: 0.6.3
+      whatwg-encoding: 3.1.1
+
   encoding@0.1.13:
     dependencies:
       iconv-lite: 0.6.3
@@ -10787,6 +10958,8 @@ snapshots:
 
   etag@1.8.1: {}
 
+  event-target-shim@5.0.1: {}
+
   eventemitter3@4.0.7: {}
 
   events@3.3.0: {}
@@ -10990,11 +11163,18 @@ snapshots:
       typescript: 5.6.3
       webpack: 5.97.1(@swc/core@1.5.29(@swc/helpers@0.5.15))(webpack-cli@5.1.4)
 
+  form-data-encoder@1.7.2: {}
+
   form-data@4.0.1:
     dependencies:
       asynckit: 0.4.0
       combined-stream: 1.0.8
       mime-types: 2.1.35
+
+  formdata-node@4.4.1:
+    dependencies:
+      node-domexception: 1.0.0
+      web-streams-polyfill: 4.0.0-beta.3
 
   forwarded@0.2.0: {}
 
@@ -11210,6 +11390,13 @@ snapshots:
 
   html-escaper@2.0.2: {}
 
+  htmlparser2@9.1.0:
+    dependencies:
+      domelementtype: 2.3.0
+      domhandler: 5.0.3
+      domutils: 3.2.1
+      entities: 4.5.0
+
   http-assert@1.5.0:
     dependencies:
       deep-equal: 1.0.1
@@ -11308,6 +11495,10 @@ snapshots:
       - supports-color
 
   human-signals@2.1.0: {}
+
+  humanize-ms@1.2.1:
+    dependencies:
+      ms: 2.1.3
 
   hyperdyperid@1.2.0: {}
 
@@ -12129,6 +12320,8 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
+  libphonenumber-js@1.11.17: {}
+
   license-webpack-plugin@4.0.2(webpack@5.97.1):
     dependencies:
       webpack-sources: 3.2.3
@@ -12309,6 +12502,8 @@ snapshots:
     dependencies:
       minimist: 1.2.8
 
+  moment@2.30.1: {}
+
   ms@2.0.0: {}
 
   ms@2.1.3: {}
@@ -12385,6 +12580,8 @@ snapshots:
 
   node-addon-api@7.1.1:
     optional: true
+
+  node-domexception@1.0.0: {}
 
   node-fetch@2.7.0(encoding@0.1.13):
     dependencies:
@@ -12553,6 +12750,18 @@ snapshots:
       is-docker: 2.2.1
       is-wsl: 2.2.0
 
+  openai@4.77.3(encoding@0.1.13):
+    dependencies:
+      '@types/node': 18.16.20
+      '@types/node-fetch': 2.6.12
+      abort-controller: 3.0.0
+      agentkeepalive: 4.6.0
+      form-data-encoder: 1.7.2
+      formdata-node: 4.4.1
+      node-fetch: 2.7.0(encoding@0.1.13)
+    transitivePeerDependencies:
+      - encoding
+
   opener@1.5.2: {}
 
   optionator@0.9.4:
@@ -12641,6 +12850,15 @@ snapshots:
   parse-node-version@1.0.1: {}
 
   parse-passwd@1.0.0: {}
+
+  parse5-htmlparser2-tree-adapter@7.1.0:
+    dependencies:
+      domhandler: 5.0.3
+      parse5: 7.2.1
+
+  parse5-parser-stream@7.1.2:
+    dependencies:
+      parse5: 7.2.1
 
   parse5@4.0.0: {}
 
@@ -13164,7 +13382,7 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  rc-picker@4.8.3(dayjs@1.11.13)(luxon@3.5.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  rc-picker@4.8.3(dayjs@1.11.13)(luxon@3.5.0)(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@babel/runtime': 7.26.0
       '@rc-component/trigger': 2.2.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -13177,6 +13395,7 @@ snapshots:
     optionalDependencies:
       dayjs: 1.11.13
       luxon: 3.5.0
+      moment: 2.30.1
 
   rc-progress@4.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
@@ -14216,6 +14435,8 @@ snapshots:
       has-symbols: 1.1.0
       which-boxed-primitive: 1.1.1
 
+  undici@6.21.0: {}
+
   unicode-canonical-property-names-ecmascript@2.0.1: {}
 
   unicode-match-property-ecmascript@2.0.0:
@@ -14274,6 +14495,8 @@ snapshots:
 
   validate-npm-package-name@5.0.1: {}
 
+  validator@13.12.0: {}
+
   vary@1.1.2: {}
 
   w3c-xmlserializer@4.0.0:
@@ -14296,6 +14519,8 @@ snapshots:
   wcwidth@1.0.1:
     dependencies:
       defaults: 1.0.4
+
+  web-streams-polyfill@4.0.0-beta.3: {}
 
   webidl-conversions@3.0.1: {}
 
@@ -14459,7 +14684,13 @@ snapshots:
     dependencies:
       iconv-lite: 0.6.3
 
+  whatwg-encoding@3.1.1:
+    dependencies:
+      iconv-lite: 0.6.3
+
   whatwg-mimetype@3.0.0: {}
+
+  whatwg-mimetype@4.0.0: {}
 
   whatwg-url@11.0.0:
     dependencies:
