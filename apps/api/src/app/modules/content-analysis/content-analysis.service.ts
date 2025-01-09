@@ -1,35 +1,22 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { lastValueFrom, firstValueFrom } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import * as dotenv from 'dotenv';
 import moment from 'moment';
 import * as cheerio from 'cheerio';
+import * as puppeteer from 'puppeteer';
 
 dotenv.config();
 
+interface TweetResponse {
+  content: string;
+  author: string;
+  profileImage: string;
+  followersCount: string;
+}
+
 @Injectable()
 export class ContentAnalysisService {
-  private readonly twitterAPI = 'https://api.twitter.com/2';
-
-  private healthKeywords: string[] = [
-    'health',
-    'mental health',
-    'vaccine',
-    'pandemic',
-    'stress',
-    'well-being',
-    'mental wellness',
-    'farming mental health',
-    'isolation',
-    'depression',
-    'anxiety',
-    'financial strain',
-    'burnout',
-    'emotional well-being',
-    'mental health awareness',
-    'mental health challenges',
-  ];
-
   constructor(private readonly httpService: HttpService) {}
 
   // Normalize response from Gemini
@@ -122,6 +109,68 @@ export class ContentAnalysisService {
     return results;
   }
 
+  // Get influencer tweet
+  async scrapeTweets(username): Promise<TweetResponse[]> {
+    const browser = await puppeteer.launch({
+      headless: true, // Change to 'true' to avoid the browser popup
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--window-size=1280x1024',
+      ],
+    });
+
+    const page = await browser.newPage();
+
+    // Set a realistic user agent to avoid detection
+    await page.setUserAgent(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    );
+
+    // Navigate to the Twitter user’s page
+    await page.goto(`https://x.com/${username}`, { waitUntil: 'networkidle2' });
+
+    // Scroll to load more tweets
+    let lastHeight = await page.evaluate('document.body.scrollHeight');
+    for (let i = 0; i < 10; i++) {
+      // Increase loop count to load more tweets
+      await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
+      // await page.waitForTimeout(3000); // Wait a bit for new tweets to load
+      const newHeight = await page.evaluate('document.body.scrollHeight');
+      if (newHeight === lastHeight) break; // Stop scrolling if no new content
+      lastHeight = newHeight;
+    }
+
+    // Wait for tweets to load (ensure we have an article element)
+    await page.waitForSelector('article');
+
+    // Scrape the tweets data and user profile info
+    const tweetsData = await page.evaluate(() => {
+      const tweetElements = document.querySelectorAll('article');
+      const tweetList = [];
+      const profileImage =
+        (document.querySelector('img[src*="profile"]') as any)?.src ||
+        'No profile image'; // Profile picture URL
+      const followersCount =
+        document.querySelector('a[href*="followers"] span')?.textContent ||
+        'No followers count';
+
+      tweetElements.forEach((tweet) => {
+        const content = tweet.querySelector('div[lang]')?.textContent;
+        const author = tweet.querySelector('span')?.textContent;
+        if (content && author) {
+          tweetList.push({ content, author, profileImage, followersCount });
+        }
+      });
+
+      return tweetList;
+    });
+
+    await browser.close();
+
+    return tweetsData as TweetResponse[];
+  }
+
   // AI analysis with Gemini
   async askGeminiAI(questions: string) {
     const response = await firstValueFrom(
@@ -164,115 +213,13 @@ export class ContentAnalysisService {
     notes?: string,
     maxResults = 10
   ): Promise<any> {
-    const url = `${this.twitterAPI}/tweets/search/recent`;
-    const token = process.env.TWITTER_BEARER_TOKEN;
-
-    if (!token) {
-      throw new HttpException(
-        'Twitter Bearer Token is missing',
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
-
     try {
-      let query = '';
-
-      // Construct the query based on the username and health-related keywords
-      if (username) {
-        query = `from:${username} (${this.healthKeywords
-          .map((k) => `"${k}"`)
-          .join(' OR ')})`;
-      } else {
-        query = this.healthKeywords.map((k) => `"${k}"`).join(' OR ');
-      }
-
-      // Handle time range
-      const dateRange = this.getDateRange(timeRange);
-
-      // Make the request to fetch tweets
-      // const response = await lastValueFrom(
-      //   this.httpService.get(url, {
-      //     headers: {
-      //       Authorization: `Bearer ${token}`,
-      //     },
-      //     params: {
-      //       query,
-      //       max_results: maxResults,
-      //       'tweet.fields': 'created_at,text',
-      //       expansions: 'author_id',
-      //       'user.fields': 'id,name,username,profile_image_url,created_at',
-      //       ...(timeRange === 'allTime'
-      //         ? {}
-      //         : {
-      //             start_time: dateRange.start,
-      //             end_time: dateRange.end,
-      //           }),
-      //     },
-      //   })
-      // );
-
-      const response = {
-        data: {
-          data: [
-            {
-              edit_history_tweet_ids: ['1876637275532283980'],
-              text: 'RT @VigilantFox: 10 Shocking Stories the Media Buried Today\n\n#10 - The COVID “vaccines” damage the brain and DEVASTATE mental health, as co…',
-              author_id: '795690992108179459',
-              created_at: '2025-01-07T14:29:27.000Z',
-              id: '1876637275532283980',
-            },
-          ],
-          includes: {
-            users: [
-              {
-                created_at: '2016-11-07T18:14:50.000Z',
-                id: '795690992108179459',
-                name: 'The GoldFish Report',
-                profile_image_url:
-                  'https://pbs.twimg.com/profile_images/1756358237874540544/HqsTx_BK_normal.jpg',
-                username: 'ReportGoldfish',
-              },
-            ],
-          },
-          meta: {
-            newest_id: '1876637294310158777',
-            oldest_id: '1876637117180416481',
-            result_count: 100,
-            next_token: 'b26v89c19zqg8o3frr6t6igivrw5zy43yw9al01zaaf7h',
-          },
-        },
-      };
-
-      // Combining tweets with user details
-      const tweets = response.data.data;
-      const users = response.data.includes.users;
-
-      const combinedData = tweets.map((tweet) => {
-        const user = users.find((user) => user.id === tweet.author_id);
-        return {
-          ...tweet,
-          user: user
-            ? {
-                name: user.name,
-                username: user.username,
-                profile_image_url: user.profile_image_url,
-              }
-            : null,
-        };
-      });
-
-      const filtered = combinedData.filter((tweet) => {
-        // Check if tweet contains any of the health-related keywords
-        return this.healthKeywords.some((keyword) =>
-          tweet.text.toLowerCase().includes(keyword)
-        );
-      });
-
+      const twitResponse = await this.scrapeTweets(username);
       const analizedTweet = await Promise.all(
-        filtered.map(async (tweet) => {
+        twitResponse.map(async (tweet) => {
           // Generate statement from tweet
           const statement = await this.askGeminiAI(
-            `If it contains health aspects, conclude what the point of this tweet is please return only the essence briefly. If not, don't show anything. the tweet: "${tweet.text}"`
+            `If it contains health aspects, conclude what the point of this tweet is please return only the essence briefly. If not, don't show anything return empty. the tweet: "${tweet.content}"`
           );
           let journals = '';
           let statementComparedWithJournal = '';
@@ -325,121 +272,6 @@ export class ContentAnalysisService {
           };
         })
       );
-
-      // const analizedTweet = [
-      //   {
-      //     tweet: {
-      //       edit_history_tweet_ids: ['1876637275532283980'],
-      //       text: 'RT @VigilantFox: 10 Shocking Stories the Media Buried Today\n\n#10 - The COVID “vaccines” damage the brain and DEVASTATE mental health, as co…',
-      //       author_id: '795690992108179459',
-      //       created_at: '2025-01-07T14:29:27.000Z',
-      //       id: '1876637275532283980',
-      //       user: {
-      //         name: 'The GoldFish Report',
-      //         username: 'ReportGoldfish',
-      //         profile_image_url:
-      //           'https://pbs.twimg.com/profile_images/1756358237874540544/HqsTx_BK_normal.jpg',
-      //       },
-      //     },
-      //     statement:
-      //       'The tweet claims COVID vaccines cause brain damage and mental health issues.',
-      //     aiAnalysis:
-      //       'The provided statement ("The tweet claims COVID vaccines cause brain damage and mental health issues") does *not* directly match the content of the listed journal articles.  While several articles discuss brain damage (specifically traumatic brain injury), mental health issues, and the COVID-19 pandemic, none directly address the claim that COVID-19 vaccines *cause* brain damage or mental health problems.  The articles explore correlations and associations between various factors and mental/neurological health outcomes, but don\'t support the causal link stated in the tweet.',
-      //     journals: [
-      //       {
-      //         title:
-      //           'Science denial and COVID conspiracy theories: potential neurological mechanisms and possible responses',
-      //         authors: 'BL Miller�- Jama, 2020 - jamanetwork.com',
-      //         journal: 'Jama, 2020',
-      //         year: 'BL Miller�',
-      //         link: 'https://jamanetwork.com/journals/jama/article-abstract/2772693',
-      //       },
-      //       {
-      //         title:
-      //           'Helping the public understand adverse events associated with COVID-19 vaccinations: lessons learned from functional neurological disorder',
-      //         authors:
-      //           'DD Kim, CS Kung, DL Perez�- JAMA neurology, 2021 - jamanetwork.com',
-      //         journal: 'JAMA neurology, 2021',
-      //         year: 'DD Kim, CS Kung, DL Perez�',
-      //         link: 'https://jamanetwork.com/journals/jamaneurology/article-abstract/2778192',
-      //       },
-      //       {
-      //         title:
-      //           'Widespread misinformation about infertility continues to create COVID-19 vaccine hesitancy',
-      //         authors: 'J Abbasi�- Jama, 2022 - jamanetwork.com',
-      //         journal: 'Jama, 2022',
-      //         year: 'J Abbasi�',
-      //         link: 'https://jamanetwork.com/journals/jama/article-abstract/2789477',
-      //       },
-      //       {
-      //         title:
-      //           'Association of social determinants of health and vaccinations with child mental health during the COVID-19 pandemic in the US',
-      //         authors:
-      //           'Y Xiao, PSF Yip, J Pathak, JJ Mann�- JAMA psychiatry, 2022 - jamanetwork.com',
-      //         journal: 'JAMA psychiatry, 2022',
-      //         year: 'Y Xiao, PSF Yip, J Pathak, JJ Mann�',
-      //         link: 'https://jamanetwork.com/journals/jamapsychiatry/article-abstract/2791321',
-      //       },
-      //       {
-      //         title:
-      //           'Association of traumatic brain injury with the risk of developing chronic cardiovascular, endocrine, neurological, and psychiatric disorders',
-      //         authors:
-      //           'S Izzy, PM Chen, Z Tahir, R Grashow…�- JAMA network�…, 2022 - jamanetwork.com',
-      //         journal: 'JAMA network�…, 2022',
-      //         year: 'S Izzy, PM Chen, Z Tahir, R Grashow…�',
-      //         link: 'https://jamanetwork.com/journals/jamanetworkopen/article-abstract/2791599',
-      //       },
-      //       {
-      //         title:
-      //           '[HTML][HTML] Cognition and memory after Covid-19 in a large community sample',
-      //         authors:
-      //           'A Hampshire, A Azor, C Atchison…�- …�Journal of Medicine, 2024 - Mass Medical Soc',
-      //         journal: '…�Journal of Medicine, 2024',
-      //         year: 'A Hampshire, A Azor, C Atchison…�',
-      //         link: 'https://www.nejm.org/doi/full/10.1056/NEJMoa2311330',
-      //       },
-      //       {
-      //         title:
-      //           'The COVID-19 pandemic and mental health concerns on Twitter in the United States',
-      //         authors:
-      //           'S Zhang, L Sun, D Zhang, P Li, Y Liu, A Anand…�- Health Data�…, 2022 - spj.science.org',
-      //         journal: 'Health Data�…, 2022',
-      //         year: 'S Zhang, L Sun, D Zhang, P Li, Y Liu, A Anand…�',
-      //         link: 'https://spj.science.org/doi/pdf/10.34133/2022/9758408?adobe_mc=MCMID%3D13000405405683999525849378418609464876%7CMCORGID%3D242B6472541199F70A4C98A6%2540AdobeOrg%7CTS%3D1681430400',
-      //       },
-      //       {
-      //         title:
-      //           'Associations of military-related traumatic brain injury with new-onset mental health conditions and suicide risk',
-      //         authors:
-      //           'LA Brenner, JE Forster, JL Gradus…�- JAMA network�…, 2023 - jamanetwork.com',
-      //         journal: 'JAMA network�…, 2023',
-      //         year: 'LA Brenner, JE Forster, JL Gradus…�',
-      //         link: 'https://jamanetwork.com/journals/jamanetworkopen/article-abstract/2807787',
-      //       },
-      //       {
-      //         title:
-      //           'Association of sex and age with mild traumatic brain injury–related symptoms: a TRACK-TBI study',
-      //         authors:
-      //           '…, E Yuh, R Zafonte, TRACK-TBI Investigators�- JAMA network�…, 2021 - jamanetwork.com',
-      //         journal: 'TBI Investigators�',
-      //         year: '…, E Yuh, R Zafonte, TRACK',
-      //         link: 'https://jamanetwork.com/journals/jamanetworkopen/article-abstract/2778183',
-      //       },
-      //       {
-      //         title:
-      //           'Traumatic brain injury and veteran mortality after the war in Afghanistan',
-      //         authors:
-      //           'MA Reger, LA Brenner, A du Pont�- JAMA network open, 2022 - jamanetwork.com',
-      //         journal: 'JAMA network open, 2022',
-      //         year: 'MA Reger, LA Brenner, A du Pont�',
-      //         link: 'https://jamanetwork.com/journals/jamanetworkopen/article-abstract/2788981',
-      //       },
-      //     ],
-      //     categories: 'Medicine, Mental Health',
-      //     status: 'Debunked',
-      //     trustScore: '10',
-      //   },
-      // ];
 
       return analizedTweet;
     } catch (error) {
