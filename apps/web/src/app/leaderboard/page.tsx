@@ -1,6 +1,15 @@
 'use client';
 
-import { Breadcrumb, Layout, theme, Tag, Button, Table, Avatar } from 'antd';
+import {
+  Breadcrumb,
+  Layout,
+  theme,
+  Tag,
+  Button,
+  Table,
+  Avatar,
+  message,
+} from 'antd';
 import {
   UserOutlined,
   BarChartOutlined,
@@ -9,77 +18,34 @@ import {
   RiseOutlined,
   FallOutlined,
 } from '@ant-design/icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 export default function Index() {
   const { Content } = Layout;
   const [tag, setTag] = useState('All');
   const [sortDescending, setSortDescending] = useState(false);
+  const [leaderboard, setLeaderboard] = useState<any>([]);
+  const [loading, setLoading] = useState(true);
+  const totalClaims = leaderboard
+    .map((m: any) => m.verifiedClaims)
+    .reduce((acc: any, claim: any) => acc + claim, 0);
+
+  const totalTrustScore = leaderboard
+    .map((m: any) => Number(m.trustScore))
+    .reduce((acc: any, score: any) => acc + score, 0);
+  const averageScore = (totalTrustScore / leaderboard.length).toFixed(2);
+  const allCategories = leaderboard.map((item: any) => item.categories).flat();
+  const categories = ['All', ...new Set(allCategories)];
 
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
-  const categories = [
-    'All',
-    'Nutrition',
-    'Fitness',
-    'Medicine',
-    'Mental Health',
-  ];
-
-  const dataSource = [
-    {
-      id: 'peterAttia',
-      rank: '#1',
-      influencer: 'Dr. Peter Attia',
-      category: 'Medicine',
-      trustScore: 94,
-      trend: 'up',
-      followers: '1.2M+',
-      verifiedClaims: '203',
-      avatar: 'https://randomuser.me/api/portraits/men/1.jpg', // Sample avatar URL
-    },
-    {
-      id: 'rhondaPatrick',
-      rank: '#2',
-      influencer: 'Dr. Rhonda Patrick',
-      category: 'Nutrition',
-      trustScore: 91,
-      trend: 'down',
-      followers: '980K+',
-      verifiedClaims: '156',
-      avatar: 'https://randomuser.me/api/portraits/women/2.jpg', // Sample avatar URL
-    },
-    {
-      id: 'coachGreg',
-      rank: '#3',
-      influencer: 'Coach Greg',
-      category: 'Fitness',
-      trustScore: 88,
-      trend: 'up',
-      followers: '700K+',
-      verifiedClaims: '120',
-      avatar: 'https://randomuser.me/api/portraits/men/3.jpg', // Sample avatar URL
-    },
-    {
-      id: 'andrewHuberman',
-      rank: '#4',
-      influencer: 'Dr. Andrew Huberman',
-      category: 'Mental Health',
-      trustScore: 56,
-      trend: 'up',
-      followers: '1.5M+',
-      verifiedClaims: '220',
-      avatar: 'https://randomuser.me/api/portraits/men/4.jpg', // Sample avatar URL
-    },
-  ];
-
   const filteredData =
     tag === 'All'
-      ? dataSource
-      : dataSource.filter((item) => item.category === tag);
+      ? leaderboard
+      : leaderboard.filter((item: any) => item.categories.includes(tag));
 
   const sortedData = sortDescending
     ? [...filteredData].sort(
@@ -92,6 +58,10 @@ export default function Index() {
       title: 'RANK',
       dataIndex: 'rank',
       key: 'rank',
+      render: (_: any, __: any, index: number) => {
+        ++index;
+        return `#${index}`;
+      },
     },
     {
       title: 'INFLUENCER',
@@ -101,23 +71,24 @@ export default function Index() {
           className="flex items-center flex-row gap-2"
           href={`/influencer/${record.id}`}
         >
-          <Avatar src={record.avatar} size="large" />
-          <div>{record.influencer}</div>
+          <Avatar src={record.profileImage} size="large" />
+          <div>{record.name}</div>
         </Link>
       ),
     },
     {
       title: 'CATEGORY',
-      dataIndex: 'category',
-      key: 'category',
+      dataIndex: 'categories',
+      key: 'categories',
+      render: (categories: any) => categories.join(', '),
     },
     {
       title: 'TRUST SCORE',
       dataIndex: 'trustScore',
       key: 'trustScore',
       render: (text: string) => {
-        // Extract numeric value for conditional coloring
         const numericScore = parseFloat(text);
+
         let color;
 
         if (numericScore >= 90) {
@@ -139,17 +110,20 @@ export default function Index() {
       title: 'TREND',
       dataIndex: 'trend',
       key: 'trend',
-      render: (_: any, record: any) =>
-        record.trend === 'up' ? (
-          <RiseOutlined className="text-green-500 text-[20px]" />
-        ) : (
-          <FallOutlined className="text-red-500 text-[20px]" />
-        ),
+      render: (_: any, record: any) => {
+        const numericScore = parseFloat(record.trustScore);
+
+        if (numericScore >= 70) {
+          return <RiseOutlined className="text-green-500 text-[20px]" />;
+        } else {
+          return <FallOutlined className="text-red-500 text-[20px]" />;
+        }
+      },
     },
     {
       title: 'FOLLOWERS',
-      dataIndex: 'followers',
-      key: 'followers',
+      dataIndex: 'followersCount',
+      key: 'followersCount',
     },
     {
       title: 'VERIFIED CLAIMS',
@@ -158,10 +132,31 @@ export default function Index() {
     },
   ];
 
+  const getLeaderboard = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`http://localhost:3001/api/influencer`);
+      if (!response.ok) throw new Error('Failed to fetch leaderboard.');
+      const data = await response.json();
+
+      setLeaderboard(data);
+    } catch (error: any) {
+      message.error(error.message || 'Something went wrong.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getLeaderboard();
+  }, []);
+
   return (
     <Content className="px-[48px] h-full">
       <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>Back to Dashboard</Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <Link href="/">Back to Dashboard</Link>
+        </Breadcrumb.Item>
         <Breadcrumb.Item>Leaderboard</Breadcrumb.Item>
       </Breadcrumb>
       <div
@@ -183,28 +178,28 @@ export default function Index() {
           <div className="flex flex-row rounded-[5px] border items-center p-4 bg-blue-100 border-blue-400 w-full">
             <UserOutlined className="mr-3 text-[30px] text-blue-500" />
             <div className="flex flex-col">
-              <div className="font-bold text-[20px]">1,234</div>
+              <div className="font-bold text-[20px]">{leaderboard.length}</div>
               <div>Active Influencers</div>
             </div>
           </div>
           <div className="flex flex-row rounded-[5px] border items-center p-4 bg-blue-100 border-blue-400 w-full">
             <CheckCircleOutlined className="mr-3 text-[30px] text-blue-500" />
             <div className="flex flex-col">
-              <div className="font-bold text-[20px]">25,431</div>
+              <div className="font-bold text-[20px]">{totalClaims}</div>
               <div>Claims Verified</div>
             </div>
           </div>
           <div className="flex flex-row rounded-[5px] border items-center p-4 bg-blue-100 border-blue-400 w-full">
             <BarChartOutlined className="mr-3 text-[30px] text-blue-500" />
             <div className="flex flex-col">
-              <div className="font-bold text-[20px]">85.7%</div>
+              <div className="font-bold text-[20px]">{averageScore}%</div>
               <div>Average Trust Score</div>
             </div>
           </div>
         </div>
         <div className="flex flex-col sm:flex-row justify-between gap-2 my-5 items-center">
           <div className="flex flex-wrap gap-2 sm:block">
-            {categories.map((name) => (
+            {categories.map((name: any) => (
               <Tag
                 key={name}
                 bordered={false}
@@ -222,7 +217,7 @@ export default function Index() {
           </Button>
         </div>
         <div className="w-full overflow-x-auto">
-          <Table dataSource={sortedData} columns={columns} />
+          <Table dataSource={sortedData} columns={columns} loading={loading} />
         </div>
       </div>
     </Content>

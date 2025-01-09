@@ -9,6 +9,8 @@ import {
   Form,
   Input,
   Button,
+  Spin,
+  message,
 } from 'antd';
 import {
   RiseOutlined,
@@ -18,7 +20,7 @@ import {
   LinkOutlined,
   OpenAIOutlined,
 } from '@ant-design/icons';
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 
 type ClaimSearchPayload = {
@@ -34,6 +36,44 @@ type Claim = {
   trustScore: number;
   aiAnalysis: string;
   sourceLinks: string;
+  journals: any;
+};
+
+const JournalList = ({ journals }: any) => {
+  if (!journals) return;
+
+  return (
+    <div className="mt-6">
+      <h2 className="mb-2">Journal Articles</h2>
+      <ul className="list-none p-0">
+        {(journals || []).map((journal: any, index: number) => (
+          <li
+            key={index}
+            className="border border-gray-300 rounded-lg p-4 mb-3 shadow-lg"
+          >
+            <h3 className="m-0 mb-2 font-bold">{journal.title}</h3>
+            <p className="m-0 text-gray-700">
+              <strong>Authors:</strong> {journal.authors.replace('…�', '...')}
+            </p>
+            <p className="m-0 text-gray-700">
+              <strong>Journal:</strong> {journal.journal.replace('…�', '...')}
+            </p>
+            <p className="m-0 text-gray-700">
+              <strong>Year:</strong> {journal.year.replace('…�', '...')}
+            </p>
+            <a
+              href={journal.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 font-bold hover:underline"
+            >
+              Read More
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 };
 
 export default function Index({ params: { id } }: { params: { id: string } }) {
@@ -43,12 +83,26 @@ export default function Index({ params: { id } }: { params: { id: string } }) {
   ]);
   const [selectedVerificationStatuses, setSelectedVerificationStatuses] =
     useState<string[]>(['All Statuses']);
-
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
-  const tags = ['All', 'Nutrition', 'Fitness', 'Medicine', 'Mental Health'];
+  const [analysis, setAnalysis] = useState<any>([]);
+  const [loading, setLoading] = useState(true);
+
+  const profile = analysis[0];
+
+  const tags = useMemo(() => {
+    const allCategories = analysis
+      .map((item: any) => item.categories.split(', '))
+      .flat();
+
+    return [...new Set(allCategories)];
+  }, []);
+
+  const scores = analysis.map((item: any) => Number(item.trustScore));
+  const total = scores.reduce((acc: any, score: any) => acc + score, 0);
+  const averageScore = (total / scores.length).toFixed(2);
 
   const categories = [
     'All',
@@ -65,50 +119,38 @@ export default function Index({ params: { id } }: { params: { id: string } }) {
     'Debunked',
   ];
 
-  const claimsData: Claim[] = [
-    {
-      status: 'Verified',
-      date: '10/10/2024',
-      claimText:
-        'Viewing sunlight within 30-60 minutes of waking enhances cortisol release',
-      trustScore: 92,
-      aiAnalysis:
-        'Multiple studies confirm morning light exposure affects cortisol rhythms. Timing window supported by research.',
-      sourceLinks: '/view-source',
-    },
-    {
-      status: 'Questionable',
-      date: '11/12/2024',
-      claimText: 'Drinking 8 cups of coffee a day improves memory retention',
-      trustScore: 45,
-      aiAnalysis:
-        'Conflicting evidence exists. While caffeine aids focus, excessive consumption may impair long-term memory.',
-      sourceLinks: '/view-research',
-    },
-  ];
+  const claimsData: Claim[] = analysis.map((m: any) => ({
+    status: m.status,
+    date: m.tweet.date,
+    claimText: m.tweet.content,
+    trustScore: m.trustScore,
+    aiAnalysis: m.aiAnalysis,
+    sourceLinks: '/view-source',
+    journals: m.journals,
+  }));
 
   const statistic = [
     {
       title: 'Trust Score',
-      value: '89%',
-      description: 'Based on 127 verified claims',
+      value: averageScore,
+      description: `Based on ${analysis.length} verified claims`,
       icon: <RiseOutlined className="mb-auto text-blue-600 text-[20px]" />,
     },
     {
       title: 'Yearly Revenue',
-      value: '$5.0M',
+      value: '-',
       description: 'Estimated earnings',
       icon: <DollarOutlined className="mb-auto text-blue-600 text-[20px]" />,
     },
     {
       title: 'Products',
-      value: '1',
+      value: '-',
       description: 'Recommended products',
       icon: <ProductOutlined className="mb-auto text-blue-600 text-[20px]" />,
     },
     {
       title: 'Followers',
-      value: '4.2M+',
+      value: profile?.tweet?.followersCount || 0,
       description: 'Total following',
       icon: <RiseOutlined className="mb-auto text-blue-600 text-[20px]" />,
     },
@@ -134,11 +176,52 @@ export default function Index({ params: { id } }: { params: { id: string } }) {
     );
   };
 
+  const getInfluencerById = async (id: string) => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `http://localhost:3001/api/influencer/${id}`
+      );
+      if (!response.ok) throw new Error('Failed to fetch influencer details.');
+      const data = await response.json();
+
+      setAnalysis(JSON.parse(data.analysis));
+    } catch (error: any) {
+      message.error(error.message || 'Something went wrong.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getInfluencerById(id);
+  }, [id]);
+
+  if (loading) {
+    return (
+      <Content className="px-[48px] h-screen flex justify-center items-center">
+        <Spin size="large" />
+      </Content>
+    );
+  }
+
+  if (!analysis.length) {
+    return (
+      <Content className="px-[48px] h-screen flex justify-center items-center">
+        <div>No influencer found with ID: {id}</div>
+      </Content>
+    );
+  }
+
   return (
     <Content className="px-[48px] h-full">
       <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>Back to Dashboard</Breadcrumb.Item>
-        <Breadcrumb.Item>Influencer</Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <Link href="/">Back to Dashboard</Link>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <Link href="/leaderboard">Leaderboard</Link>
+        </Breadcrumb.Item>
         <Breadcrumb.Item>{id}</Breadcrumb.Item>
       </Breadcrumb>
       <div
@@ -151,30 +234,23 @@ export default function Index({ params: { id } }: { params: { id: string } }) {
         <div className="flex flex-col sm:flex-row items-center">
           <div className="w-[100px]">
             <Avatar
-              src={'https://randomuser.me/api/portraits/men/1.jpg'}
+              src={profile.tweet.profileImage}
               size="large"
               style={{ width: '100px', height: '100px' }}
             />
           </div>
           <div className="flex flex-col gap-2 w-full sm:ml-5">
             <div className="font-bold text-[24px] text-center sm:text-left">
-              Andrew Huberman
+              {profile.tweet.author}
             </div>
             <div className="flex flex-wrap gap-2 sm:block">
-              {tags.map((name) => (
+              {tags.map((name: any) => (
                 <Tag key={name} bordered={false} color="#3c82f6">
                   <span className="text-[12px]">{name}</span>
                 </Tag>
               ))}
             </div>
-            <div>
-              Stanford Professor of Neurobiology and Ophthalmology, focusing on
-              neural development, brain plasticity, and neural regeneration.
-              Host of the Huberman Lab Podcast, translating neuroscience into
-              practical tools for everyday life. Known for evidence-based
-              approaches to performance, sleep, stress management, and brain
-              optimization.
-            </div>
+            <div>{profile?.tweet?.bio}</div>
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-5 my-5">
@@ -194,7 +270,7 @@ export default function Index({ params: { id } }: { params: { id: string } }) {
             </div>
           ))}
         </div>
-        <div className="text-blue-600 text-bold mb-5">Claims Analysis</div>
+        {/* <div className="text-blue-600 text-bold mb-5">Claims Analysis</div>
         <div className="p-4 bg-blue-50 rounded">
           <Form
             name="basic"
@@ -272,8 +348,7 @@ export default function Index({ params: { id } }: { params: { id: string } }) {
               </Button>
             </Form.Item>
           </Form>
-        </div>
-        {/* make this show by data */}
+        </div> */}
         <div className="text-blue-600 text-bold my-5">
           Showing {claimsData.length} claims
         </div>
@@ -325,6 +400,7 @@ export default function Index({ params: { id } }: { params: { id: string } }) {
                   <Link href={claim.sourceLinks}>
                     <LinkOutlined /> View Research
                   </Link>
+                  <JournalList journals={claim.journals} />
                 </div>
               </div>
             );

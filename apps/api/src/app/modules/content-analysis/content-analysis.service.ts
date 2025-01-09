@@ -2,22 +2,27 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import * as dotenv from 'dotenv';
-import moment from 'moment';
 import * as cheerio from 'cheerio';
 import * as puppeteer from 'puppeteer';
+import { PrismaService } from '../prisma/prisma.service';
 
 dotenv.config();
 
 interface TweetResponse {
   content: string;
+  data: string;
   author: string;
+  bio: string;
   profileImage: string;
   followersCount: string;
 }
 
 @Injectable()
 export class ContentAnalysisService {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private prisma: PrismaService
+  ) {}
 
   // Normalize response from Gemini
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -34,35 +39,6 @@ export class ContentAnalysisService {
       return response.data.candidates[0].content.parts[0].text.trim();
     }
     return '';
-  }
-
-  // Date range helper
-  private getDateRange(timeRange: string): { start: string; end: string } {
-    const now = moment();
-    let start;
-
-    switch (timeRange) {
-      case 'lastWeek':
-        start = now.subtract(1, 'week').startOf('week').toISOString();
-        break;
-      case 'lastMonth':
-        start = now.subtract(1, 'month').startOf('month').toISOString(); // Start of last month
-        break;
-      case 'lastYear':
-        start = now.subtract(1, 'year').startOf('year').toISOString(); // Start of last year
-        break;
-      case 'allTime':
-        start = moment('2000-01-01').toISOString(); // Arbitrary early date for "all time"
-        break;
-      default:
-        start = now.subtract(1, 'week').startOf('week').toISOString(); // Default to "last week" if no valid range is given
-        break;
-    }
-
-    // Ensure the end time is always the current moment
-    const end = now.toISOString();
-
-    return { start, end };
   }
 
   // Search and parse journals from google scholars
@@ -155,11 +131,27 @@ export class ContentAnalysisService {
         document.querySelector('a[href*="followers"] span')?.textContent ||
         'No followers count';
 
+      // Extract bio
+      const bio =
+        document.querySelector('div[data-testid="UserDescription"]')
+          ?.textContent || 'No bio available';
+
       tweetElements.forEach((tweet) => {
         const content = tweet.querySelector('div[lang]')?.textContent;
         const author = tweet.querySelector('span')?.textContent;
+        const date =
+          tweet.querySelector('time')?.getAttribute('datetime') ||
+          'No date available';
+
         if (content && author) {
-          tweetList.push({ content, author, profileImage, followersCount });
+          tweetList.push({
+            date,
+            content,
+            author,
+            bio,
+            profileImage,
+            followersCount,
+          });
         }
       });
 
@@ -203,10 +195,33 @@ export class ContentAnalysisService {
     return result;
   }
 
+  // Function to save tweet analysis to the database
+  private async saveAnalysisToDatabase(
+    username: string,
+    analysis: any
+  ): Promise<void> {
+    try {
+      await this.prisma.influencer.upsert({
+        where: { id: username },
+        update: { analysis: JSON.stringify(analysis) },
+        create: {
+          id: username,
+          analysis: JSON.stringify(analysis),
+        },
+      });
+    } catch (error) {
+      console.error('Error saving analysis to database:', error);
+      throw new HttpException(
+        'Failed to save analysis to the database',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
   /**
    * Fetch recent tweets by params
    */
-  async fetchTweets(
+  async tweetsAnalysis(
     username?: string,
     timeRange?: string,
     journalSources?: string[],
@@ -219,13 +234,22 @@ export class ContentAnalysisService {
         twitResponse.map(async (tweet) => {
           // Generate statement from tweet
           const statement = await this.askGeminiAI(
-            `If it contains health aspects, conclude what the point of this tweet is please return only the essence briefly. If not, don't show anything return empty. the tweet: "${tweet.content}"`
+            `If it contains health aspects, conclude what the point of this tweet is please return only the essence briefly. If not, don't show anything. the tweet: "${tweet.content}"`
           );
+
+          const checkStatement = await this.askGeminiAI(
+            `check if statement is contain health topic "${tweet.content}", return "YES" if contain and return "NO" if not contain`
+          );
+
           let journals = '';
           let statementComparedWithJournal = '';
           let categorized = '';
           let status = '';
           let trustScore = '';
+
+          if (checkStatement === 'NO') {
+            return null;
+          }
 
           if (statement) {
             // Search related journal from the statement if any
@@ -273,7 +297,11 @@ export class ContentAnalysisService {
         })
       );
 
-      return analizedTweet;
+      const filterAnalizedTweet = analizedTweet.filter((f) => f);
+
+      await this.saveAnalysisToDatabase(username, filterAnalizedTweet);
+
+      return filterAnalizedTweet;
     } catch (error) {
       console.log('error: ', error);
       throw new HttpException(

@@ -10,9 +10,12 @@ import {
   Button,
   Radio,
   Switch,
+  FormProps,
+  Spin,
 } from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
 
 enum ResearchType {
@@ -39,10 +42,12 @@ type ResearchPayload = {
 };
 
 export default function Index() {
+  const router = useRouter();
   const { Content } = Layout;
   const [researchType, setResearchType] = useState(ResearchType.spesific);
   const [timeRange, setTimeRange] = useState(TimeRange.lastWeek);
   const [toggleJournal, setToggleJournal] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const journal = [
     {
@@ -78,6 +83,57 @@ export default function Index() {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
+  const startResearch: FormProps<ResearchPayload>['onFinish'] = async (
+    values
+  ) => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      params.append('timeRange', values.timeRange || '');
+      params.append('influencerName', values.influencerName || '');
+      params.append('claims', values.claims?.toString() || '0');
+      if (values.product !== undefined) {
+        params.append('product', values.product.toString());
+      }
+      if (values.revenue) {
+        params.append('revenue', values.revenue.toString());
+      }
+      if (toggleJournal && values.journals?.length) {
+        params.append('journals', values.journals.join(', '));
+      }
+      if (values.notes) {
+        params.append('notes', values.notes);
+      }
+
+      const apiEndpoint =
+        'http://localhost:3001/api/influencer/content/analysis';
+      const response = await fetch(`${apiEndpoint}?${params.toString()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+
+      router.push(`/influencer/${values.influencerName}`);
+    } catch (error) {
+      console.error('Failed to start research:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <Content className="px-[48px] h-screen flex justify-center items-center flex-col">
+        <Spin size="large" />
+        <div className="mt-5">Analyzing content...</div>
+      </Content>
+    );
+  }
 
   return (
     <Content className="px-[48px] h-full">
@@ -127,20 +183,11 @@ export default function Index() {
           layout="vertical"
           style={{ maxWidth: 600 }}
           initialValues={{ remember: true }}
-          onFinish={() => {
-            //
-          }}
-          onFinishFailed={() => {
-            //
-          }}
+          onFinish={startResearch}
           autoComplete="off"
         >
           <div className="my-5">
-            <Form.Item<ResearchPayload>
-              label="Time Range"
-              name="timeRange"
-              rules={[{ required: true, message: 'Please select Time Range!' }]}
-            >
+            <Form.Item<ResearchPayload> label="Time Range" name="timeRange">
               <Radio.Group
                 options={[
                   { label: 'Last Week', value: TimeRange.lastWeek },
@@ -172,7 +219,6 @@ export default function Index() {
             <Form.Item<ResearchPayload>
               label="Claims to Analyze per Influencer"
               name="claims"
-              rules={[{ required: true, message: 'Please input Claims!' }]}
               style={{ margin: 0 }}
             >
               <Input type="number" placeholder="50" />
