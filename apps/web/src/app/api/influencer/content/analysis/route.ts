@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import axios from 'axios';
-import puppeteer from 'puppeteer-core';
+import puppeteer from 'puppeteer';
 import chromium from '@sparticuz/chromium';
 import puppeteerCore from 'puppeteer-core';
 import * as cheerio from 'cheerio';
@@ -71,23 +71,26 @@ async function searchScholarlyArticles(query: string, journals: string[] = []) {
 
 // Function to scrape tweets
 async function scrapeTweets(username: string): Promise<TweetResponse[]> {
-  // const browser = await puppeteer.launch({
-  //   headless: true, // Change to 'true' to avoid the browser popup
-  //   args: [
-  //     '--no-sandbox',
-  //     '--disable-setuid-sandbox',
-  //     '--disable-dev-shm-usage',
-  //     '--window-size=1280x1024',
-  //   ],
-  // });
+  let browser: any;
 
-  const browser = await puppeteerCore.launch({
-    headless: true, // Change to 'true' to avoid the browser popup
-    args: chromium.args,
-    defaultViewport: chromium.defaultViewport,
-    executablePath: await chromium.executablePath(),
-  });
-
+  if (process.env.NODE_ENV === 'production') {
+    browser = await puppeteerCore.launch({
+      headless: true, // Change to 'true' to avoid the browser popup
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+    });
+  } else {
+    browser = await puppeteer.launch({
+      headless: true, // Change to 'true' to avoid the browser popup
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--window-size=1280x1024',
+      ],
+    });
+  }
   const page = await browser.newPage();
 
   // Set a realistic user agent to avoid detection
@@ -195,91 +198,98 @@ export async function GET(req: Request) {
     );
   }
 
-  try {
-    const twitResponse = await scrapeTweets(username);
+  // Immediately return the response with a success status
+  const immediateResponse = NextResponse.json({
+    message: 'Processing request in the background...',
+  });
 
-    const analizedTweet = await Promise.all(
-      twitResponse.map(async (tweet) => {
-        // Generate statement from tweet
-        const statement = await askGeminiAI(
-          `If it contains health aspects, conclude what the point of this tweet is please return only the essence briefly. If not, don't show anything. the tweet: "${tweet.content}"`
-        );
+  Promise.resolve().then(async () => {
+    try {
+      const twitResponse = await scrapeTweets(username);
 
-        const checkStatement = await askGeminiAI(
-          `check if statement is contain health topic "${tweet.content}", return "YES" if contain and return "NO" if not contain`
-        );
+      const analizedTweet = await Promise.all(
+        twitResponse.map(async (tweet) => {
+          // Generate statement from tweet
+          const statement = await askGeminiAI(
+            `If it contains health aspects, conclude what the point of this tweet is please return only the essence briefly. If not, don't show anything. the tweet: "${tweet.content}"`
+          );
 
-        let journals = '';
-        let statementComparedWithJournal = '';
-        let categorized = '';
-        let status = '';
-        let trustScore = '';
+          const checkStatement = await askGeminiAI(
+            `check if statement is contain health topic "${tweet.content}", return "YES" if contain and return "NO" if not contain`
+          );
 
-        if (checkStatement === 'NO') {
-          return null;
-        }
+          let journals = '';
+          let statementComparedWithJournal = '';
+          let categorized = '';
+          let status = '';
+          let trustScore = '';
 
-        if (statement) {
-          // Search related journal from the statement if any
-          if (journalSources.length) {
-            journals = await searchScholarlyArticles(statement, journalSources);
+          if (checkStatement === 'NO') {
+            return null;
           }
-          // Compare statement with journal or use AI analysis
-          statementComparedWithJournal = await askGeminiAI(
-            journalSources.length
-              ? `compare this statement "${statement}" whether it matches the following journal (${JSON.stringify(
-                  journals
-                )}), if the statement matches the journal, bring up the journal as a reference ${
-                  notes ? `and ${notes}` : ''
-                }`
-              : `please analize this statement "${statement}" is it valid or not ${
-                  notes ? `and ${notes}` : ''
-                }`
-          );
-          // Categorized the result (Nutrition, Medicine, Mental Health)
-          categorized = await askGeminiAI(
-            `create a "health" category from this statement "${statement}", for example the categories Nutrition, Medicine, Mental Health, please not return only categories string, if have multiple return with comma`
-          );
-          // Determine the status (Verified, Questionable, Debunked)
-          status = await askGeminiAI(
-            `create a verification status (Verified, Questionable, Debunked) from this statement "${statement}" and AI conclusion "${statementComparedWithJournal}", please note only return the status`
-          );
-          // Determine the trust score
-          trustScore = await askGeminiAI(
-            `create a score of trusted tweet from 0 until 100 from this statement "${statement}" and AI conclusion "${statementComparedWithJournal}", please note only return the number`
-          );
-        }
 
-        return {
-          tweet,
-          statement,
-          aiAnalysis: statementComparedWithJournal,
-          journals,
-          categories: categorized,
-          status,
-          trustScore,
-        };
-      })
-    );
+          if (statement) {
+            // Search related journal from the statement if any
+            if (journalSources.length) {
+              journals = await searchScholarlyArticles(
+                statement,
+                journalSources
+              );
+            }
+            // Compare statement with journal or use AI analysis
+            statementComparedWithJournal = await askGeminiAI(
+              journalSources.length
+                ? `compare this statement "${statement}" whether it matches the following journal (${JSON.stringify(
+                    journals
+                  )}), if the statement matches the journal, bring up the journal as a reference ${
+                    notes ? `and ${notes}` : ''
+                  }`
+                : `please analize this statement "${statement}" is it valid or not ${
+                    notes ? `and ${notes}` : ''
+                  }`
+            );
+            // Categorized the result (Nutrition, Medicine, Mental Health)
+            categorized = await askGeminiAI(
+              `create a "health" category from this statement "${statement}", for example the categories Nutrition, Medicine, Mental Health, please not return only categories string, if have multiple return with comma`
+            );
+            // Determine the status (Verified, Questionable, Debunked)
+            status = await askGeminiAI(
+              `create a verification status (Verified, Questionable, Debunked) from this statement "${statement}" and AI conclusion "${statementComparedWithJournal}", please note only return the status`
+            );
+            // Determine the trust score
+            trustScore = await askGeminiAI(
+              `create a score of trusted tweet from 0 until 100 from this statement "${statement}" and AI conclusion "${statementComparedWithJournal}", please note only return the number`
+            );
+          }
 
-    const filteredAnalizedTweet = analizedTweet.filter((f: any) => f);
+          return {
+            tweet,
+            statement,
+            aiAnalysis: statementComparedWithJournal,
+            journals,
+            categories: categorized,
+            status,
+            trustScore,
+          };
+        })
+      );
 
-    // Save data in the database
-    await prisma.influencer.upsert({
-      where: { id: username },
-      update: { analysis: JSON.stringify(filteredAnalizedTweet) },
-      create: {
-        id: username,
-        analysis: JSON.stringify(filteredAnalizedTweet),
-      },
-    });
+      const filteredAnalizedTweet = analizedTweet.filter((f: any) => f);
 
-    return NextResponse.json(filteredAnalizedTweet);
-  } catch (error) {
-    console.error('Error processing request:', error);
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    );
-  }
+      // Save data in the database
+      await prisma.influencer.upsert({
+        where: { id: username },
+        update: { analysis: JSON.stringify(filteredAnalizedTweet) },
+        create: {
+          id: username,
+          analysis: JSON.stringify(filteredAnalizedTweet),
+        },
+      });
+    } catch (error) {
+      console.error('Error processing request:', error);
+    }
+  });
+
+  // Return immediately with success
+  return immediateResponse;
 }

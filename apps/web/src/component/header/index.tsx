@@ -54,8 +54,6 @@ export default function Header() {
     }
   };
 
-  console.log('here currentKey = ', pathname);
-
   return (
     <Header
       className="flex w-full top-0 z-10 items-center sm:justify-between"

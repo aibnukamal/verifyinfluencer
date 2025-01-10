@@ -118,16 +118,19 @@ export default function Index() {
         message.error(
           `Failed to analyze ${values.influencerName} please try again`
         );
+        setLoading(false);
         return;
       }
 
-      router.push(`/influencer/${values.influencerName}`);
+      setTimeout(() => {
+        router.push(`/influencer/${values.influencerName}`);
+        setLoading(false);
+      }, 40000);
     } catch (error) {
       message.error(
         `Failed to analyze ${values.influencerName} please try again`
       );
       console.error('Failed to start research:', error);
-    } finally {
       setLoading(false);
     }
   };

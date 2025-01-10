@@ -187,7 +187,7 @@ export default function Index({ params: { id } }: { params: { id: string } }) {
 
       setAnalysis(JSON.parse(data.analysis));
     } catch (error: any) {
-      message.error(error.message || 'Something went wrong.');
+      // message.error(error.message || 'Something went wrong.');
     } finally {
       setLoading(false);
     }
@@ -207,8 +207,11 @@ export default function Index({ params: { id } }: { params: { id: string } }) {
 
   if (!analysis.length) {
     return (
-      <Content className="px-[48px] h-screen flex justify-center items-center">
-        <div>No influencer found with ID: {id}</div>
+      <Content className="px-[48px] h-screen flex justify-center items-center flex-col">
+        <div className="mb-3">
+          Failed to analyze content from <b>{id}</b>
+        </div>
+        <Link href="/">Retry research</Link>
       </Content>
     );
   }
