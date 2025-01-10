@@ -33,7 +33,7 @@ export async function GET() {
     });
 
     leaderboard.sort(
-      (a, b) => parseFloat(b.trustScore) - parseFloat(a.trustScore)
+      (a: any, b: any) => parseFloat(b.trustScore) - parseFloat(a.trustScore)
     );
 
     return NextResponse.json(leaderboard);
