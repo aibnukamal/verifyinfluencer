@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import puppeteer from 'puppeteer';
 import chromium from '@sparticuz/chromium';
 import puppeteerCore from 'puppeteer-core';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 interface TweetResponse {
   content: string;
@@ -15,6 +18,16 @@ interface TweetResponse {
 // Function to scrape tweets
 async function scrapeTweets(username: string): Promise<TweetResponse[]> {
   let browser: any;
+
+  // Save data in the database
+  await prisma.influencer.upsert({
+    where: { id: username },
+    update: { analysis: JSON.stringify({ status: 'started' }) },
+    create: {
+      id: username,
+      analysis: JSON.stringify({ status: 'started' }),
+    },
+  });
 
   if (process.env.NODE_ENV === 'production') {
     browser = await puppeteerCore.launch({
@@ -98,6 +111,16 @@ async function scrapeTweets(username: string): Promise<TweetResponse[]> {
 
   await browser.close();
 
+  // Save data in the database
+  await prisma.influencer.upsert({
+    where: { id: username },
+    update: { analysis: JSON.stringify(tweetsData) },
+    create: {
+      id: username,
+      analysis: JSON.stringify(tweetsData),
+    },
+  });
+
   return tweetsData as TweetResponse[];
 }
 
@@ -114,9 +137,9 @@ export async function GET(req: Request) {
   }
 
   try {
-    const twitResponse = await scrapeTweets(username);
+    scrapeTweets(username);
 
-    return NextResponse.json(twitResponse);
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error fetching tweet:', error);
     return NextResponse.json(
