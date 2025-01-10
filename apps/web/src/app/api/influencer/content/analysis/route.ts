@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import axios from 'axios';
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
+import chromium from '@sparticuz/chromium';
+import puppeteerCore from 'puppeteer-core';
 import * as cheerio from 'cheerio';
 
 interface TweetResponse {
@@ -69,13 +71,21 @@ async function searchScholarlyArticles(query: string, journals: string[] = []) {
 
 // Function to scrape tweets
 async function scrapeTweets(username: string): Promise<TweetResponse[]> {
-  const browser = await puppeteer.launch({
+  // const browser = await puppeteer.launch({
+  //   headless: true, // Change to 'true' to avoid the browser popup
+  //   args: [
+  //     '--no-sandbox',
+  //     '--disable-setuid-sandbox',
+  //     '--disable-dev-shm-usage',
+  //     '--window-size=1280x1024',
+  //   ],
+  // });
+
+  const browser = await puppeteerCore.launch({
     headless: true, // Change to 'true' to avoid the browser popup
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--window-size=1280x1024',
-    ],
+    args: chromium.args,
+    defaultViewport: chromium.defaultViewport,
+    executablePath: await chromium.executablePath(),
   });
 
   const page = await browser.newPage();
