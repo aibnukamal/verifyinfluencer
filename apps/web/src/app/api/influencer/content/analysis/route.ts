@@ -163,7 +163,7 @@ async function askGeminiAI(question: string) {
     },
     {
       headers: { 'Content-Type': 'application/json' },
-      params: { key: process.env.GEMINI_API_KEY },
+      params: { key: process.env.NEXT_PUBLIC_GEMINI_API_KEY },
     }
   );
 
