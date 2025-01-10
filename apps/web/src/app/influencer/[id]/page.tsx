@@ -180,7 +180,7 @@ export default function Index({ params: { id } }: { params: { id: string } }) {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:3001/api/influencer/${id}`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/influencer/${id}`
       );
       if (!response.ok) throw new Error('Failed to fetch influencer details.');
       const data = await response.json();

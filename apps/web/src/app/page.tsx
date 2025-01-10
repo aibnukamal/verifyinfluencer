@@ -106,8 +106,7 @@ export default function Index() {
         params.append('notes', values.notes);
       }
 
-      const apiEndpoint =
-        'http://localhost:3001/api/influencer/content/analysis';
+      const apiEndpoint = `${process.env.NEXT_PUBLIC_API_URL}/api/influencer/content/analysis`;
       const response = await fetch(`${apiEndpoint}?${params.toString()}`, {
         method: 'GET',
         headers: {

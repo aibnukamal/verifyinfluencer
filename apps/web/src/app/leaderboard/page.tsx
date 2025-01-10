@@ -135,7 +135,9 @@ export default function Index() {
   const getLeaderboard = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:3001/api/influencer`);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/influencer`
+      );
       if (!response.ok) throw new Error('Failed to fetch leaderboard.');
       const data = await response.json();
 
