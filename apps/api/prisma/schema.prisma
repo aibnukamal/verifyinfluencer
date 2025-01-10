@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://root:root@localhost:5432/verifyinfluencer?schema=public"
+  url      = env("DATABASE_URL")
 }
 
 model Influencer {
