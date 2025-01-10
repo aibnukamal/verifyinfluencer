@@ -117,16 +117,7 @@ export async function GET(req: Request) {
   }
 
   try {
-    // Save data in the database
-    await prisma.influencer.upsert({
-      where: { id: username },
-      update: { analysis: JSON.stringify({ status: 'started' }) },
-      create: {
-        id: username,
-        analysis: JSON.stringify({ status: 'started' }),
-      },
-    });
-    // scrapeTweets(username);
+    scrapeTweets(username);
 
     return NextResponse.json({ success: true });
   } catch (error) {
