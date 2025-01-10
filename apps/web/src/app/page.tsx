@@ -122,10 +122,10 @@ export default function Index() {
         return;
       }
 
-      setTimeout(() => {
-        router.push(`/influencer/${values.influencerName}`);
-        setLoading(false);
-      }, 40000);
+      // setTimeout(() => {
+      router.push(`/influencer/${values.influencerName}`);
+      setLoading(false);
+      // }, 40000);
     } catch (error) {
       message.error(
         `Failed to analyze ${values.influencerName} please try again`
