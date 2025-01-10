@@ -13,7 +13,7 @@ datasource db {
   url      = env("NEXT_PUBLIC_DATABASE_URL")
 }
 
-model Influencer {
+model influencer {
   id                 String  @id @unique
   analysis           String  
 
