@@ -19,16 +19,6 @@ interface TweetResponse {
 async function scrapeTweets(username: string): Promise<TweetResponse[]> {
   let browser: any;
 
-  // Save data in the database
-  await prisma.influencer.upsert({
-    where: { id: username },
-    update: { analysis: JSON.stringify({ status: 'started' }) },
-    create: {
-      id: username,
-      analysis: JSON.stringify({ status: 'started' }),
-    },
-  });
-
   if (process.env.NODE_ENV === 'production') {
     browser = await puppeteerCore.launch({
       headless: true, // Change to 'true' to avoid the browser popup
@@ -111,16 +101,6 @@ async function scrapeTweets(username: string): Promise<TweetResponse[]> {
 
   await browser.close();
 
-  // Save data in the database
-  await prisma.influencer.upsert({
-    where: { id: username },
-    update: { analysis: JSON.stringify(tweetsData) },
-    create: {
-      id: username,
-      analysis: JSON.stringify(tweetsData),
-    },
-  });
-
   return tweetsData as TweetResponse[];
 }
 
@@ -137,7 +117,16 @@ export async function GET(req: Request) {
   }
 
   try {
-    scrapeTweets(username);
+    // Save data in the database
+    await prisma.influencer.upsert({
+      where: { id: username },
+      update: { analysis: JSON.stringify({ status: 'started' }) },
+      create: {
+        id: username,
+        analysis: JSON.stringify({ status: 'started' }),
+      },
+    });
+    // scrapeTweets(username);
 
     return NextResponse.json({ success: true });
   } catch (error) {
