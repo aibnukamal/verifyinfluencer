@@ -7,7 +7,7 @@ export async function GET() {
   try {
     const influencers = await prisma.influencer.findMany();
 
-    const leaderboard = influencers.map((influencer) => {
+    const leaderboard = influencers.map((influencer: any) => {
       const analysis = JSON.parse(influencer.analysis as string);
       const scores = analysis.map((item: any) => Number(item.trustScore));
       const total = scores.reduce((acc: any, score: any) => acc + score, 0);

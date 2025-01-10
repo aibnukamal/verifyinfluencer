@@ -12,6 +12,7 @@ import {
   Switch,
   FormProps,
   Spin,
+  message,
 } from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
 import { useState } from 'react';
@@ -114,11 +115,17 @@ export default function Index() {
         },
       });
       if (!response.ok) {
-        throw new Error(`Error: ${response.statusText}`);
+        message.error(
+          `Failed to analyze ${values.influencerName} please try again`
+        );
+        return;
       }
 
       router.push(`/influencer/${values.influencerName}`);
     } catch (error) {
+      message.error(
+        `Failed to analyze ${values.influencerName} please try again`
+      );
       console.error('Failed to start research:', error);
     } finally {
       setLoading(false);
