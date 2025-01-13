@@ -217,9 +217,11 @@ export default function Index() {
             <Form.Item<ResearchPayload>
               label="Influencer User Name"
               name="influencerName"
-              rules={[{ required: true, message: 'Example: foundmyfitness' }]}
+              rules={[
+                { required: true, message: 'Please input Influencer Name!' },
+              ]}
             >
-              <Input placeholder="Enter Influencer Name" />
+              <Input placeholder="Example: foundmyfitness" />
             </Form.Item>
           </div>
           <div className="my-5">
